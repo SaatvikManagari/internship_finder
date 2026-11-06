@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Silicon Intern Radar</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='6' y='6' width='20' height='20' rx='3' fill='%2314b8a6'/><g stroke='%2314b8a6' stroke-width='2'><path d='M10 2v4M16 2v4M22 2v4M10 26v4M16 26v4M22 26v4M2 10h4M2 16h4M2 22h4M26 10h4M26 16h4M26 22h4'/></g></svg>">
+<style>
+:root{
+  --bg:#f6f7f9;--panel:#fff;--panel2:#f0f2f5;--text:#14181f;--muted:#5c6573;--line:#e1e4ea;
+  --accent:#0f9488;--accent-weak:#d6f3ef;--warn:#b45309;--warn-weak:#fdf0d9;--bad:#b91c1c;--bad-weak:#fde2e2;
+  --new:#7c3aed;--new-weak:#ede5fe;--good:#15803d;--good-weak:#dcf5e3;--shadow:0 1px 2px rgba(0,0,0,.05),0 2px 8px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1116;--panel:#161a21;--panel2:#1d222b;--text:#e7eaf0;--muted:#98a1b0;--line:#2a303b;
+  --accent:#2dd4bf;--accent-weak:#123a37;--warn:#f5b454;--warn-weak:#3a2a10;--bad:#f87171;--bad-weak:#3b1616;
+  --new:#b197fc;--new-weak:#2a2143;--good:#4ade80;--good-weak:#123222;--shadow:none;}}
+:root[data-theme="dark"]{
+  --bg:#0e1116;--panel:#161a21;--panel2:#1d222b;--text:#e7eaf0;--muted:#98a1b0;--line:#2a303b;
+  --accent:#2dd4bf;--accent-weak:#123a37;--warn:#f5b454;--warn-weak:#3a2a10;--bad:#f87171;--bad-weak:#3b1616;
+  --new:#b197fc;--new-weak:#2a2143;--good:#4ade80;--good-weak:#123222;--shadow:none;}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--accent)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+header{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top{display:flex;align-items:center;gap:12px;padding:12px 0;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;letter-spacing:-.01em;margin-right:auto}
+.brand small{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12px;border:1px solid var(--line);background:var(--panel);color:var(--muted);white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.dot.ok{background:var(--good)}.dot.off{background:var(--warn)}
+.btn{border:1px solid var(--line);background:var(--panel);padding:7px 12px;border-radius:8px;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+:root[data-theme="dark"] .btn.primary{color:#04221f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.primary{color:#04221f}}
+.btn:disabled{opacity:.6;cursor:progress}
+.btn.sm{padding:3px 8px;font-size:12px;border-radius:6px}
+.icon-btn{border:1px solid transparent;background:none;padding:4px 7px;border-radius:6px;color:var(--muted)}
+.icon-btn:hover{border-color:var(--line);color:var(--text)}
+.icon-btn.on{color:var(--accent)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:0 0 10px;align-items:center}
+.toolbar input[type=search]{flex:1 1 240px;min-width:0;padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel)}
+select,.inp{padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel)}
+.tabs{display:flex;gap:2px;background:var(--panel2);padding:3px;border-radius:9px}
+.tabs button{border:0;background:none;padding:5px 12px;border-radius:7px;color:var(--muted)}
+.tabs button.on{background:var(--panel);color:var(--text);box-shadow:var(--shadow)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 0 12px}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:3px 11px;font-size:12.5px;color:var(--muted)}
+.chip.on{background:var(--accent-weak);border-color:var(--accent);color:var(--text)}
+.chip .n{opacity:.7;margin-left:4px}
+label.tog{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);white-space:nowrap}
+main{display:grid;grid-template-columns:1fr 300px;gap:20px;padding:16px 0 60px}
+@media (max-width:900px){main{grid-template-columns:1fr}}
+.summary{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px;margin:0 0 10px;gap:10px;flex-wrap:wrap}
+.list{display:flex;flex-direction:column;gap:8px}
+.job{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:4px 12px;box-shadow:var(--shadow)}
+.job.applied{opacity:.72}
+.job h3{margin:0;font-size:15px;font-weight:600;line-height:1.3}
+.job h3 a{color:var(--text);text-decoration:none}
+.job h3 a:hover{color:var(--accent);text-decoration:underline}
+.meta{color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:4px 12px}
+.meta b{color:var(--text);font-weight:600}
+.tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.tag{font-size:11.5px;padding:1px 8px;border-radius:999px;background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+.tag.cat{background:var(--accent-weak);color:var(--text);border-color:transparent}
+.tag.new{background:var(--new-weak);color:var(--new);border-color:transparent;font-weight:600}
+.tag.applied{background:var(--good-weak);color:var(--good);border-color:transparent;font-weight:600}
+.actions{display:flex;gap:2px;align-items:flex-start;grid-row:1 / span 3;grid-column:2}
+aside .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow)}
+aside h4{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.src{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;padding:3px 0;border-bottom:1px dashed var(--line)}
+.src:last-child{border-bottom:0}
+.src .st{color:var(--muted);white-space:nowrap}
+.src .st.err{color:var(--bad)}.src .st.skip{color:var(--warn)}.src .st.ok{color:var(--good)}
+.links a{display:block;font-size:13px;padding:2px 0}
+.empty{text-align:center;color:var(--muted);padding:50px 20px;border:1px dashed var(--line);border-radius:12px}
+.banner{background:var(--warn-weak);color:var(--text);border:1px solid color-mix(in srgb,var(--warn) 40%,transparent);padding:10px 14px;border-radius:10px;margin:14px 0 0;font-size:13px}
+.progress{height:3px;background:transparent;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+/* settings */
+dialog{border:1px solid var(--line);border-radius:14px;padding:0;background:var(--panel);color:var(--text);width:min(920px,calc(100vw - 24px));max-height:calc(100vh - 40px)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.dlg-head{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.dlg-head h2{margin:0;font-size:16px;margin-right:auto}
+.dlg-body{padding:16px 18px;overflow:auto;max-height:calc(100vh - 170px)}
+.dlg-foot{display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid var(--line)}
+.pane{display:none}.pane.on{display:block}
+.field{margin:0 0 14px}
+.field label{display:block;font-weight:600;margin:0 0 4px;font-size:13px}
+.field .hint{color:var(--muted);font-size:12px;margin:2px 0 6px}
+.field textarea,.field input.inp{width:100%}
+textarea{padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);font:12.5px/1.5 ui-monospace,Consolas,monospace;resize:vertical}
+table.co{width:100%;border-collapse:collapse;font-size:13px}
+table.co th{text-align:left;color:var(--muted);font-weight:500;padding:4px 6px;border-bottom:1px solid var(--line)}
+table.co td{padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.co td.id{font-family:ui-monospace,Consolas,monospace;font-size:12px;word-break:break-all;color:var(--muted)}
+.addrow{display:grid;grid-template-columns:1fr 130px 2fr auto;gap:6px;margin-top:10px}
+@media (max-width:640px){.addrow{grid-template-columns:1fr}.co .hide-sm{display:none}}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){.row2{grid-template-columns:1fr}}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect x="6" y="6" width="20" height="20" rx="3" fill="var(--accent)"/><g stroke="var(--accent)" stroke-width="2"><path d="M10 2v4M16 2v4M22 2v4M10 26v4M16 26v4M22 26v4M2 10h4M2 16h4M2 22h4M26 10h4M26 16h4M26 22h4"/></g></svg>
+        <div>Silicon Intern Radar<small>RTL · ASIC · VLSI · Hardware internships in India</small></div>
+      </div>
+      <span class="pill" id="proxyPill" title="Proxy status"><span class="dot"></span><span>checking…</span></span>
+      <span class="pill" id="autoPill" title="Auto-refresh"></span>
+      <button class="btn" id="themeBtn" title="Toggle theme">◐</button>
+      <button class="btn" id="settingsBtn">⚙ Settings</button>
+      <button class="btn primary" id="refreshBtn">↻ Fetch now</button>
+    </div>
+    <div class="toolbar">
+      <div class="tabs" id="viewTabs">
+        <button data-v="all" class="on">All</button>
+        <button data-v="new">New</button>
+        <button data-v="saved">Saved</button>
+        <button data-v="applied">Applied</button>
+        <button data-v="hidden">Hidden</button>
+      </div>
+      <input type="search" id="q" placeholder="Search title, company, location…">
+      <select id="companyFilter" aria-label="Company"><option value="">All companies</option></select>
+      <select id="sort" aria-label="Sort">
+        <option value="date">Newest first</option>
+        <option value="rel">Most relevant</option>
+        <option value="company">Company A–Z</option>
+      </select>
+      <label class="tog" title="Only show roles matching your hardware keyword categories"><input type="checkbox" id="strict"> Keyword-matched roles only</label>
+    </div>
+    <div class="chips" id="catChips"></div>
+  </div>
+  <div class="progress"><i id="prog"></i></div>
+</header>
+
+<div class="wrap">
+  <div id="banner"></div>
+  <main>
+    <section>
+      <div class="summary"><span id="summary"></span><span id="lastFetch"></span></div>
+      <div class="list" id="list"></div>
+    </section>
+    <aside>
+      <div class="card"><h4>Sources</h4><div id="sources"></div></div>
+      <div class="card links"><h4>Search manually</h4><div id="quicklinks"></div></div>
+    </aside>
+  </main>
+</div>
+
+<dialog id="dlg">
+  <div class="dlg-head">
+    <h2>Settings</h2>
+    <div class="tabs" id="setTabs">
+      <button data-p="companies" class="on">Companies</button>
+      <button data-p="keywords">Keywords</button>
+      <button data-p="aggregators">Job APIs</button>
+      <button data-p="general">Refresh &amp; proxy</button>
+    </div>
+  </div>
+  <div class="dlg-body">
+    <div class="pane on" data-p="companies">
+      <p class="hint" style="margin-top:0;color:var(--muted)">Career boards fetched every refresh. <b>Workday</b> &amp; <b>AMD</b> need the proxy (local server or Netlify); <b>Greenhouse</b>, <b>Lever</b> and <b>Ashby</b> work anywhere.</p>
+      <table class="co"><thead><tr><th>On</th><th>Company</th><th class="hide-sm">Type</th><th class="hide-sm">Board</th><th></th></tr></thead><tbody id="coRows"></tbody></table>
+      <div class="addrow">
+        <input class="inp" id="addName" placeholder="Company name">
+        <select id="addType"><option value="workday">Workday</option><option value="greenhouse">Greenhouse</option><option value="lever">Lever</option><option value="ashby">Ashby</option></select>
+        <input class="inp" id="addId" placeholder="Careers URL or board slug">
+        <button class="btn" id="addBtn">Add</button>
+      </div>
+      <p class="hint" style="color:var(--muted);font-size:12px">Examples — Workday: <code>https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite</code> · Greenhouse: <code>tenstorrent</code> (from boards.greenhouse.io/<i>slug</i>) · Lever: slug from jobs.lever.co/<i>slug</i> · Ashby: slug from jobs.ashbyhq.com/<i>slug</i></p>
+      <button class="btn sm" id="resetCos">Restore default companies</button>
+    </div>
+
+    <div class="pane" data-p="keywords">
+      <div class="field">
+        <label>Role categories</label>
+        <div class="hint">One category per line: <code>Name: keyword, keyword, …</code>. A job matches a category if any keyword appears in its title or team. With “Keyword-matched roles only” on (useful once you add JSearch/Adzuna, which return non-chip companies too), a job must match at least one category.</div>
+        <textarea id="kwCats" rows="11"></textarea>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Internship words</label><div class="hint">Title must contain one (unless the source marks it as an internship).</div><textarea id="kwIntern" rows="3"></textarea></div>
+        <div class="field"><label>Exclude words</label><div class="hint">Jobs whose title contains any of these are dropped.</div><textarea id="kwExclude" rows="3"></textarea></div>
+      </div>
+      <div class="field"><label>Location words (India)</label><div class="hint">Used for sources that can't filter by country themselves.</div><textarea id="kwLoc" rows="3"></textarea></div>
+      <button class="btn sm" id="resetKw">Restore default keywords</button>
+    </div>
+
+    <div class="pane" data-p="aggregators">
+      <p style="margin-top:0;color:var(--muted)">Optional. These search job boards like LinkedIn, Indeed, Glassdoor and Naukri. Keys are stored only in this browser.</p>
+      <div class="field">
+        <label>JSearch (RapidAPI) key</label>
+        <div class="hint">Free tier ≈ 200 requests/month. Sign up at <a href="https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch" target="_blank" rel="noopener">rapidapi.com → JSearch</a>, subscribe to the Basic plan, copy “X-RapidAPI-Key”. Each query below = 1 request per refresh.</div>
+        <input class="inp" id="jsKey" type="password" autocomplete="off" placeholder="paste key">
+      </div>
+      <div class="field"><label>JSearch queries (one per line)</label><textarea id="jsQueries" rows="5"></textarea></div>
+      <div class="row2">
+        <div class="field"><label>Adzuna app_id</label><div class="hint">Free at <a href="https://developer.adzuna.com/signup" target="_blank" rel="noopener">developer.adzuna.com</a>. Needs the proxy.</div><input class="inp" id="azId" autocomplete="off"></div>
+        <div class="field"><label>Adzuna app_key</label><div class="hint">&nbsp;</div><input class="inp" id="azKey" type="password" autocomplete="off"></div>
+      </div>
+      <div class="field"><label>Adzuna “any of” keywords</label><div class="hint">Space-separated. Combined with “intern”.</div><input class="inp" id="azWords"></div>
+    </div>
+
+    <div class="pane" data-p="general">
+      <div class="row2">
+        <div class="field">
+          <label>Auto-refresh while the page is open</label>
+          <select id="autoMin"><option value="0">Off</option><option value="15">Every 15 min</option><option value="30">Every 30 min</option><option value="60">Every hour</option><option value="180">Every 3 hours</option><option value="360">Every 6 hours</option></select>
+        </div>
+        <div class="field">
+          <label>Include job APIs in auto-refresh</label>
+          <div class="hint">Off saves your free JSearch/Adzuna quota; they still run on “Fetch now”.</div>
+          <label class="tog"><input type="checkbox" id="autoAgg"> Yes, include them</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Desktop notifications for new postings</label>
+        <label class="tog"><input type="checkbox" id="notify"> Notify me when auto-refresh finds new jobs</label>
+      </div>
+      <div class="field">
+        <label>Proxy base URL (optional)</label>
+        <div class="hint">Leave blank to use this site's own <code>/api/proxy</code>. If you open index.html directly as a file, you can point it at your Netlify site, e.g. <code>https://your-site.netlify.app</code>.</div>
+        <input class="inp" id="proxyBase" placeholder="https://your-site.netlify.app">
+      </div>
+      <div class="field">
+        <label>Data</label>
+        <button class="btn sm" id="exportBtn">Export saved/applied (JSON)</button>
+        <button class="btn sm" id="importBtn">Import…</button>
+        <button class="btn sm" id="clearCache">Clear cached results</button>
+        <input type="file" id="importFile" accept="application/json" hidden>
+      </div>
+    </div>
+  </div>
+  <div class="dlg-foot">
+    <button class="btn" id="cancelSet">Cancel</button>
+    <button class="btn primary" id="saveSet">Save &amp; fetch</button>
+  </div>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ============================== defaults ============================== */
+const WD = (name, url) => ({ name, type: "workday", id: url, enabled: true });
+const DEFAULT_COMPANIES = [
+  WD("NVIDIA", "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite"),
+  WD("Intel", "https://intel.wd1.myworkdayjobs.com/External"),
+  WD("Analog Devices", "https://analogdevices.wd1.myworkdayjobs.com/External"),
+  WD("Marvell", "https://marvell.wd1.myworkdayjobs.com/MarvellCareers"),
+  WD("NXP", "https://nxp.wd3.myworkdayjobs.com/careers"),
+  WD("Micron", "https://micron.wd1.myworkdayjobs.com/External"),
+  WD("Cadence", "https://cadence.wd1.myworkdayjobs.com/External_Careers"),
+  WD("Microchip", "https://microchiphr.wd5.myworkdayjobs.com/External"),
+  WD("Broadcom", "https://broadcom.wd1.myworkdayjobs.com/External_Career"),
+  WD("Samsung Semiconductor", "https://sec.wd3.myworkdayjobs.com/Samsung_Careers"),
+  WD("Applied Materials", "https://amat.wd1.myworkdayjobs.com/External"),
+  WD("KLA", "https://kla.wd1.myworkdayjobs.com/Search"),
+  WD("GlobalFoundries", "https://globalfoundries.wd1.myworkdayjobs.com/External"),
+  WD("Ciena", "https://ciena.wd5.myworkdayjobs.com/Careers"),
+  { name: "AMD", type: "amd", id: "careers.amd.com", enabled: true },
+  { name: "Tenstorrent", type: "greenhouse", id: "tenstorrent", enabled: true },
+  { name: "Astera Labs", type: "greenhouse", id: "asteralabs", enabled: true },
+  { name: "SambaNova", type: "greenhouse", id: "sambanovasystems", enabled: true },
+  { name: "Baya Systems", type: "greenhouse", id: "bayasystems", enabled: true },
+  { name: "Axelera AI", type: "ashby", id: "axelera", enabled: true },
+  { name: "d-Matrix", type: "ashby", id: "d-matrix", enabled: true },
+  { name: "Quadric", type: "ashby", id: "quadric", enabled: true },
+];
+const DEFAULT_CATS = `RTL / Digital Design: rtl, verilog, systemverilog, vhdl, digital design, logic design, asic, soc, microarchitecture, chip design, ip design, design engineer, silicon design, hardware design
+Design Verification: verification, dv, uvm, formal, emulation, testbench, prototyping
+Physical Design: physical design, pd, place and route, pnr, sta, static timing, timing, synthesis, floorplan, layout, physical verification, signoff
+DFT / Test / Validation: dft, atpg, scan, mbist, test engineer, test engineering, product engineer, product engineering, ate, post-silicon, post silicon, silicon validation, validation, characterization, yield
+Communications / DSP: wireless, dsp, signal processing, 5g, lte, 6g, modem, baseband, communication systems, communications
+Analog / Mixed-Signal / RF: analog, mixed signal, mixed-signal, ams, rf, circuit design, circuit, pll, serdes, power management, pmic, adc, dac, sram, memory design
+FPGA / Embedded: fpga, embedded, firmware, microcontroller, mcu, bsp, device driver, bios
+Architecture / Performance: architecture, architect, cpu, gpu, npu, performance modeling, computer architecture, risc-v, riscv
+EDA / CAD: eda, cad, flow development, methodology
+Hardware / Electrical: hardware, electrical, electronics, semiconductor, silicon, vlsi, pcb, signal integrity, power integrity, board design, ece, eee, process engineer, device engineer, packaging, photonics, optical`;
+const DEFAULT_INTERN = "intern, interns, internship, co-op, coop, trainee, apprentice, apprenticeship, student";
+const DEFAULT_EXCLUDE = "finance, accounting, marketing, sales, human resources, hr, legal, recruiting, recruiter, talent acquisition, procurement, supply chain, communications, facility, facilities, payroll, tax, audit";
+const DEFAULT_LOC = "india, bangalore, bengaluru, hyderabad, noida, pune, chennai, delhi, new delhi, gurgaon, gurugram, mumbai, ahmedabad, kochi, kolkata, trivandrum, thiruvananthapuram, coimbatore, mysore, mysuru, visakhapatnam, vizag, bhubaneswar, jaipur, chandigarh, indore, goa, mohali, gandhinagar";
+const DEFAULT_SETTINGS = {
+  companies: DEFAULT_COMPANIES, cats: DEFAULT_CATS, intern: DEFAULT_INTERN, exclude: DEFAULT_EXCLUDE, loc: DEFAULT_LOC,
+  strict: false, jsKey: "", jsQueries: "VLSI intern\nRTL design intern\nASIC verification intern\nFPGA intern\nhardware engineering intern\nanalog design intern",
+  azId: "", azKey: "", azWords: "vlsi rtl asic fpga verilog systemverilog semiconductor hardware embedded analog electronics silicon chip",
+  autoMin: 30, autoAgg: false, notify: false, proxyBase: "",
+};
+const QUICK_LINKS = [
+  ["LinkedIn — VLSI internships (past week)", "https://www.linkedin.com/jobs/search/?keywords=VLSI%20OR%20RTL%20OR%20ASIC%20intern&location=India&f_JT=I&f_TPR=r604800"],
+  ["LinkedIn — Hardware internships", "https://www.linkedin.com/jobs/search/?keywords=hardware%20engineering%20intern&location=India&f_JT=I"],
+  ["Internshala — VLSI", "https://internshala.com/internships/vlsi-internship/"],
+  ["Internshala — Electronics", "https://internshala.com/internships/electronics-internship/"],
+  ["Naukri — VLSI internship", "https://www.naukri.com/vlsi-internship-jobs"],
+  ["Qualcomm careers", "https://careers.qualcomm.com/careers?query=intern&location=India"],
+  ["Texas Instruments careers", "https://careers.ti.com/"],
+  ["Synopsys careers", "https://careers.synopsys.com/"],
+  ["Siemens EDA careers", "https://jobs.siemens.com/careers?query=intern%20EDA&location=India"],
+  ["Infineon careers", "https://www.infineon.com/careers"],
+  ["MediaTek careers", "https://careers.mediatek.com/"],
+  ["STMicroelectronics careers", "https://www.st.com/content/st_com/en/about/careers.html"],
+  ["Renesas careers", "https://jobs.renesas.com/"],
+  ["Arm careers", "https://careers.arm.com/"],
+];
+
+/* ============================== storage ============================== */
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem("sir." + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("sir." + k, JSON.stringify(v)); } catch (e) { console.warn("storage", e); } },
+};
+let S = Object.assign({}, DEFAULT_SETTINGS, LS.get("settings", {}));
+let marks = LS.get("marks", {});          // id -> {saved, applied, hidden, job}
+let firstSeen = LS.get("firstSeen", {});  // id -> ts
+let seenMark = LS.get("seenMark", 0);     // jobs first seen after this are "new"
+let cache = LS.get("cache", { jobs: [], at: 0, sources: {} });
+let facetCache = LS.get("facets", {});
+let jobs = cache.jobs || [];
+let sourceStatus = cache.sources || {};
+let ui = { view: "all", q: "", company: "", sort: "date", cats: new Set() };
+let proxyOK = false, fetching = false, autoTimer = null;
+
+/* ============================== helpers ============================== */
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const words = (s) => String(s || "").split(/[,\n]/).map((w) => w.trim().toLowerCase()).filter(Boolean);
+const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/[\s-]+/g, "[\\s\\-_/]*");
+const wordRe = (list) => list.length ? new RegExp("(?<![a-z0-9])(" + list.map(reEsc).join("|") + ")(?![a-z0-9])", "i") : null;
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), 2600); }
+function ago(ts) {
+  if (!ts) return "";
+  const s = (Date.now() - ts) / 1000;
+  if (s < 60) return "just now";
+  if (s < 3600) return Math.floor(s / 60) + " min ago";
+  if (s < 86400) return Math.floor(s / 3600) + " h ago";
+  const d = Math.floor(s / 86400); return d === 1 ? "yesterday" : d + " days ago";
+}
+function parseWorkdayPosted(t) {
+  t = String(t || "").toLowerCase();
+  const day = 86400000, now = Date.now();
+  if (t.includes("today")) return now;
+  if (t.includes("yesterday")) return now - day;
+  const m = t.match(/(\d+)\+?\s*day/); if (m) return now - Number(m[1]) * day;
+  return null;
+}
+async function pool(items, n, fn) {
+  const out = []; let i = 0;
+  await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => { while (i < items.length) { const k = i++; out[k] = await fn(items[k], k); } }));
+  return out;
+}
+
+/* ============================== compiled filters ============================== */
+let F = {};
+function compile() {
+  const cats = String(S.cats || "").split("\n").map((l) => {
+    const i = l.indexOf(":"); if (i < 0) return null;
+    const name = l.slice(0, i).trim(), kws = words(l.slice(i + 1));
+    return name && kws.length ? { name, re: wordRe(kws) } : null;
+  }).filter(Boolean);
+  F = { cats, intern: wordRe(words(S.intern)), exclude: wordRe(words(S.exclude)), loc: wordRe(words(S.loc)) };
+}
+function classify(j) {
+  const titleText = j.title + " " + (j.dept || "");
+  const text = titleText + " " + (j.desc || "");
+  const cats = F.cats.filter((c) => c.re.test(titleText) || (j.desc && c.re.test(text))).map((c) => c.name);
+  const titleCats = F.cats.filter((c) => c.re.test(titleText)).length;
+  const isIntern = j.internFlag || (F.intern ? F.intern.test(j.title) : true);
+  const isIndia = j.indiaFlag || (F.loc ? F.loc.test(j.location || "") : true);
+  const excluded = F.exclude ? F.exclude.test(j.title) : false;
+  return { cats, score: titleCats * 3 + cats.length, ok: isIntern && isIndia && !excluded };
+}
+
+/* ============================== fetching ============================== */
+function proxyUrl(u) {
+  const base = (S.proxyBase || "").replace(/\/+$/, "");
+  return base + "/api/proxy?url=" + encodeURIComponent(u);
+}
+async function checkProxy() {
+  try {
+    const base = (S.proxyBase || "").replace(/\/+$/, "");
+    if (!base && location.protocol === "file:") throw 0;
+    const r = await fetch(base + "/api/proxy?ping=1", { signal: AbortSignal.timeout(6000) });
+    proxyOK = r.ok && (await r.json()).ok === true;
+  } catch { proxyOK = false; }
+  renderProxyPill();
+}
+async function getJSON(url, { method = "GET", body, headers = {}, mode = "proxy" } = {}) {
+  // mode: "direct" (CORS-enabled API), "proxy" (needs proxy), "either"
+  const opts = { method, headers: { ...headers }, signal: AbortSignal.timeout(25000) };
+  if (body !== undefined) { opts.body = JSON.stringify(body); opts.headers["content-type"] = "application/json"; }
+  const go = async (u) => { const r = await fetch(u, opts); if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); };
+  if (mode === "direct") return go(url);
+  if (mode === "either" && !proxyOK) return go(url);
+  if (!proxyOK) throw Object.assign(new Error("needs proxy"), { skip: true });
+  return go(proxyUrl(url));
+}
+
+function parseWorkday(id) {
+  const u = new URL(id.trim());
+  const parts = u.pathname.split("/").filter(Boolean).filter((p) => !/^[a-z]{2}-[A-Z]{2}$/.test(p));
+  return { host: u.host, tenant: u.host.split(".")[0], site: parts[0] };
+}
+function findIndiaFacet(facets) {
+  let hit = null;
+  const walk = (vals, param) => { for (const v of vals || []) { if (hit) return; if (v.values) walk(v.values, v.facetParameter || param); else if (/^india$/i.test(String(v.descriptor || "").trim())) hit = { p: param, id: v.id }; } };
+  for (const f of facets || []) walk(f.values, f.facetParameter);
+  return hit;
+}
+async function fetchWorkday(c) {
+  const { host, tenant, site } = parseWorkday(c.id);
+  const api = `https://${host}/wday/cxs/${tenant}/${site}/jobs`;
+  let facet = facetCache[api];
+  if (facet === undefined) {
+    const d = await getJSON(api, { method: "POST", body: { limit: 1, offset: 0, searchText: "", appliedFacets: {} } });
+    facet = findIndiaFacet(d.facets) || null;
+    facetCache[api] = facet; LS.set("facets", facetCache);
+  }
+  const out = new Map();
+  for (const term of ["intern", "internship", "trainee"]) {
+    let offset = 0, total = Infinity;
+    while (offset < total && offset < 200) {
+      const body = { limit: 20, offset, searchText: facet ? term : term + " India", appliedFacets: facet ? { [facet.p]: [facet.id] } : {} };
+      const d = await getJSON(api, { method: "POST", body });
+      if (offset === 0) total = d.total || 0;
+      const list = d.jobPostings || [];
+      for (const p of list) {
+        if (!p.externalPath) continue;
+        out.set(p.externalPath, {
+          id: "wd:" + host + p.externalPath, title: p.title, company: c.name, location: p.locationsText || "",
+          url: `https://${host}/${site}${p.externalPath}`, posted: parseWorkdayPosted(p.postedOn), source: "Workday",
+          postedPlus: /\+/.test(p.postedOn || ""),
+          indiaFlag: !!facet,
+        });
+      }
+      if (list.length < 20) break;
+      offset += 20;
+    }
+  }
+  return [...out.values()];
+}
+async function fetchAMD(c) {
+  const out = [];
+  for (let page = 1; page <= 3; page++) {
+    const d = await getJSON(`https://${c.id}/api/jobs?keywords=intern&page=${page}&limit=100`);
+    const list = d.jobs || [];
+    for (const { data: x } of list) {
+      const loc = x.full_location || [x.city, x.country].filter(Boolean).join(", ");
+      out.push({
+        id: "amd:" + x.req_id, title: x.title, company: c.name, location: loc,
+        url: `https://${c.id}/careers-home/jobs/${x.req_id}?lang=en-us`, posted: Date.parse(x.posted_date) || null, source: "AMD careers",
+        internFlag: (x.categories || []).some((k) => /intern|student/i.test(k.name)), indiaFlag: /india/i.test(x.country || ""),
+        dept: (x.categories || []).map((k) => k.name).join(" "),
+      });
+    }
+    if (list.length < 100) break;
+  }
+  return out;
+}
+const slugOf = (id, re) => { const m = String(id).match(re); return (m ? m[1] : id).trim(); };
+async function fetchGreenhouse(c) {
+  const slug = slugOf(c.id, /greenhouse\.io\/(?:v1\/boards\/)?([^/?#]+)/i);
+  const d = await getJSON(`https://boards-api.greenhouse.io/v1/boards/${slug}/jobs`, { mode: "direct" });
+  return (d.jobs || []).map((j) => ({
+    id: "gh:" + slug + ":" + j.id, title: j.title, company: c.name, location: j.location?.name || "",
+    url: j.absolute_url, posted: Date.parse(j.first_published || j.updated_at) || null, source: "Greenhouse",
+    dept: (j.departments || []).map((x) => x.name).join(" "),
+  }));
+}
+async function fetchLever(c) {
+  const slug = slugOf(c.id, /lever\.co\/(?:v0\/postings\/)?([^/?#]+)/i);
+  const d = await getJSON(`https://api.lever.co/v0/postings/${slug}?mode=json`, { mode: "direct" });
+  return (Array.isArray(d) ? d : []).map((j) => ({
+    id: "lv:" + j.id, title: j.text, company: c.name,
+    location: [j.categories?.location, ...(j.categories?.allLocations || [])].filter(Boolean).join(" · "),
+    url: j.hostedUrl, posted: j.createdAt || null, source: "Lever",
+    internFlag: /intern/i.test(j.categories?.commitment || ""), dept: [j.categories?.team, j.categories?.department].filter(Boolean).join(" "),
+  }));
+}
+async function fetchAshby(c) {
+  const slug = slugOf(c.id, /ashbyhq\.com\/(?:posting-api\/job-board\/)?([^/?#]+)/i);
+  const d = await getJSON(`https://api.ashbyhq.com/posting-api/job-board/${slug}`, { mode: "direct" });
+  return (d.jobs || []).filter((j) => j.isListed !== false).map((j) => ({
+    id: "ab:" + slug + ":" + j.id, title: j.title, company: c.name,
+    location: [j.location, ...(j.secondaryLocations || []).map((x) => x.location), j.address?.postalAddress?.addressCountry].filter(Boolean).join(" · "),
+    url: j.jobUrl, posted: Date.parse(j.publishedAt) || null, source: "Ashby",
+    internFlag: /intern/i.test(j.employmentType || ""), dept: [j.department, j.team].filter(Boolean).join(" "),
+  }));
+}
+async function fetchJSearch(q) {
+  const u = "https://jsearch.p.rapidapi.com/search?" + new URLSearchParams({ query: q + " in India", page: "1", num_pages: "1", country: "in", date_posted: "month", employment_types: "INTERN" });
+  const d = await getJSON(u, { mode: "direct", headers: { "X-RapidAPI-Key": S.jsKey, "X-RapidAPI-Host": "jsearch.p.rapidapi.com" } });
+  return (d.data || []).map((j) => ({
+    id: "js:" + j.job_id, title: j.job_title, company: j.employer_name || "—",
+    location: [j.job_city, j.job_state, j.job_country === "IN" ? "India" : j.job_country].filter(Boolean).join(", "),
+    url: j.job_apply_link || j.job_google_link, posted: Date.parse(j.job_posted_at_datetime_utc) || null,
+    source: "JSearch" + (j.job_publisher ? " · " + j.job_publisher : ""), internFlag: /intern/i.test(j.job_employment_type || ""),
+    indiaFlag: j.job_country === "IN", desc: String(j.job_description || "").slice(0, 1500),
+  }));
+}
+async function fetchAdzuna() {
+  const u = "https://api.adzuna.com/v1/api/jobs/in/search/1?" + new URLSearchParams({ app_id: S.azId, app_key: S.azKey, results_per_page: "50", what: "intern", what_or: S.azWords, max_days_old: "45", sort_by: "date" });
+  const d = await getJSON(u, { mode: "either" });
+  return (d.results || []).map((j) => ({
+    id: "az:" + j.id, title: String(j.title || "").replace(/<[^>]+>/g, ""), company: j.company?.display_name || "—",
+    location: (j.location?.display_name || "") + ", India", url: j.redirect_url, posted: Date.parse(j.created) || null,
+    source: "Adzuna", indiaFlag: true, desc: String(j.description || "").replace(/<[^>]+>/g, "").slice(0, 800),
+  }));
+}
+const FETCHERS = { workday: fetchWorkday, amd: fetchAMD, greenhouse: fetchGreenhouse, lever: fetchLever, ashby: fetchAshby };
+
+async function fetchAll({ auto = false } = {}) {
+  if (fetching) return;
+  fetching = true; $("#refreshBtn").disabled = true; $("#refreshBtn").textContent = "Fetching…";
+  await checkProxy();
+  const tasks = S.companies.filter((c) => c.enabled).map((c) => ({ key: c.type + ":" + c.id, label: c.name, run: () => FETCHERS[c.type](c) }));
+  const useAgg = !auto || S.autoAgg;
+  if (useAgg && S.jsKey) for (const q of S.jsQueries.split("\n").map((x) => x.trim()).filter(Boolean)) tasks.push({ key: "js:" + q, label: "JSearch: " + q, run: () => fetchJSearch(q) });
+  if (useAgg && S.azId && S.azKey) tasks.push({ key: "adzuna", label: "Adzuna India", run: fetchAdzuna });
+
+  let done = 0; const prog = $("#prog"); prog.style.width = "3%";
+  const prevByKey = {}; for (const j of jobs) (prevByKey[j._src] ||= []).push(j);
+  const newStatus = {};
+  const results = await pool(tasks, 5, async (t) => {
+    let list;
+    try {
+      list = (await t.run()).map((j) => ({ ...j, _src: t.key }));
+      newStatus[t.key] = { label: t.label, n: list.length, ok: true, at: Date.now() };
+    } catch (e) {
+      // keep the previous results for a failed source so one outage doesn't wipe the list
+      list = prevByKey[t.key] || [];
+      newStatus[t.key] = { label: t.label, ok: false, skip: !!e.skip, err: e.skip ? "needs proxy" : e.message, n: list.length };
+    }
+    prog.style.width = (3 + (++done / tasks.length) * 97) + "%";
+    return list;
+  });
+  // carry over aggregator results when they weren't run this time
+  for (const k in prevByKey) if (!tasks.some((t) => t.key === k) && (k.startsWith("js:") || k === "adzuna") && (S.jsKey || S.azKey)) {
+    results.push(prevByKey[k]); newStatus[k] = { ...(sourceStatus[k] || { label: k }), note: "from last full fetch" };
+  }
+  const map = new Map(); for (const j of results.flat()) if (j && j.id && j.title) map.set(j.id, j);
+  const firstRun = !Object.keys(firstSeen).length;
+  const now = Date.now(); let fresh = [];
+  for (const j of map.values()) if (!firstSeen[j.id]) { firstSeen[j.id] = firstRun ? 1 : now; if (!firstRun) fresh.push(j); }
+  jobs = [...map.values()]; sourceStatus = newStatus;
+  cache = { jobs, at: now, sources: sourceStatus };
+  LS.set("cache", cache); LS.set("firstSeen", pruneSeen());
+  fetching = false; $("#refreshBtn").disabled = false; $("#refreshBtn").textContent = "↻ Fetch now";
+  setTimeout(() => (prog.style.width = "0"), 400);
+  render();
+  const freshOk = fresh.filter((j) => classify(j).ok && (!S.strict || classify(j).cats.length));
+  if (freshOk.length) {
+    toast(`${freshOk.length} new matching posting${freshOk.length > 1 ? "s" : ""}`);
+    if (auto && S.notify && "Notification" in window && Notification.permission === "granted") {
+      new Notification(`${freshOk.length} new internship${freshOk.length > 1 ? "s" : ""}`, { body: freshOk.slice(0, 3).map((j) => j.title + " — " + j.company).join("\n") });
+    }
+  } else if (!auto) toast("Fetch complete");
+}
+function pruneSeen() { // keep firstSeen small: drop ids not seen for a while unless marked
+  const live = new Set(jobs.map((j) => j.id)); const keys = Object.keys(firstSeen);
+  if (keys.length > 6000) for (const k of keys) if (!live.has(k) && !marks[k]) delete firstSeen[k];
+  return firstSeen;
+}
+
+/* ============================== rendering ============================== */
+function isNew(j) { const t = firstSeen[j.id]; return t > 1 && t > seenMark; }
+function visibleJobs() {
+  let base;
+  if (["saved", "applied", "hidden"].includes(ui.view)) {
+    const live = new Map(jobs.map((j) => [j.id, j]));
+    base = Object.entries(marks).filter(([, m]) => m[ui.view]).map(([id, m]) => live.get(id) || { ...m.job, gone: true });
+  } else base = jobs.filter((j) => !marks[j.id]?.hidden);
+  const q = ui.q.toLowerCase().trim();
+  const out = [];
+  for (const j of base) {
+    const c = classify(j);
+    const pinned = ["saved", "applied", "hidden"].includes(ui.view);
+    if (!pinned && !c.ok) continue;
+    if (!pinned && S.strict && !c.cats.length) continue;
+    if (ui.view === "new" && !isNew(j)) continue;
+    if (ui.company && j.company !== ui.company) continue;
+    if (ui.cats.size && !c.cats.some((x) => ui.cats.has(x))) continue;
+    if (q && !(j.title + " " + j.company + " " + j.location + " " + (j.dept || "")).toLowerCase().includes(q)) continue;
+    out.push({ j, c });
+  }
+  const sorters = {
+    date: (a, b) => (b.j.posted || firstSeen[b.j.id] || 0) - (a.j.posted || firstSeen[a.j.id] || 0),
+    rel: (a, b) => b.c.score - a.c.score || (b.j.posted || 0) - (a.j.posted || 0),
+    company: (a, b) => a.j.company.localeCompare(b.j.company) || a.j.title.localeCompare(b.j.title),
+  };
+  return out.sort(sorters[ui.sort]);
+}
+function render() {
+  compile();
+  const list = visibleJobs();
+  // category chips with counts (counted over the current view minus category filter)
+  const catCounts = {}; const saveCats = ui.cats; ui.cats = new Set();
+  for (const { c } of visibleJobs()) for (const n of c.cats) catCounts[n] = (catCounts[n] || 0) + 1;
+  ui.cats = saveCats;
+  $("#catChips").innerHTML = F.cats.map((c) => `<button class="chip ${ui.cats.has(c.name) ? "on" : ""}" data-cat="${esc(c.name)}">${esc(c.name)}<span class="n">${catCounts[c.name] || 0}</span></button>`).join("");
+  // company filter
+  const cos = [...new Set(jobs.map((j) => j.company))].sort((a, b) => a.localeCompare(b));
+  const sel = $("#companyFilter"); const cur = ui.company;
+  sel.innerHTML = `<option value="">All companies</option>` + cos.map((c) => `<option ${c === cur ? "selected" : ""}>${esc(c)}</option>`).join("");
+  // view tab counts
+  const counts = { new: jobs.filter((j) => isNew(j) && !marks[j.id]?.hidden && classify(j).ok && (!S.strict || classify(j).cats.length)).length };
+  for (const k of ["saved", "applied", "hidden"]) counts[k] = Object.values(marks).filter((m) => m[k]).length;
+  document.querySelectorAll("#viewTabs button").forEach((b) => {
+    const v = b.dataset.v; b.classList.toggle("on", v === ui.view);
+    b.textContent = v[0].toUpperCase() + v.slice(1) + (counts[v] ? ` (${counts[v]})` : "");
+  });
+  $("#summary").textContent = `${list.length} internship${list.length === 1 ? "" : "s"} shown · ${jobs.length} postings fetched`;
+  $("#lastFetch").innerHTML = cache.at ? `Last fetched ${ago(cache.at)}` + (counts.new ? ` · <button class="btn sm" id="markSeen">Mark all as seen</button>` : "") : "";
+  $("#list").innerHTML = list.length ? list.slice(0, 600).map(cardHTML).join("") : emptyHTML();
+  renderSources();
+}
+function cardHTML({ j, c }) {
+  const m = marks[j.id] || {};
+  const when = j.postedPlus ? "30+ days ago" : j.posted ? ago(j.posted) : firstSeen[j.id] > 1 ? "seen " + ago(firstSeen[j.id]) : "";
+  return `<article class="job ${m.applied ? "applied" : ""}" data-id="${esc(j.id)}">
+    <h3><a href="${esc(j.url)}" target="_blank" rel="noopener">${esc(j.title)}</a></h3>
+    <div class="actions">
+      <button class="icon-btn ${m.saved ? "on" : ""}" data-act="saved" title="${m.saved ? "Unsave" : "Save"}">${m.saved ? "★" : "☆"}</button>
+      <button class="icon-btn ${m.applied ? "on" : ""}" data-act="applied" title="${m.applied ? "Unmark applied" : "Mark applied"}">✓</button>
+      <button class="icon-btn ${m.hidden ? "on" : ""}" data-act="hidden" title="${m.hidden ? "Unhide" : "Hide"}">${m.hidden ? "↺" : "✕"}</button>
+    </div>
+    <div class="meta"><b>${esc(j.company)}</b><span>${esc(j.location || "—")}</span>${when ? `<span>${esc(when)}</span>` : ""}<span>${esc(j.source)}</span></div>
+    <div class="tags">${isNew(j) ? `<span class="tag new">NEW</span>` : ""}${m.applied ? `<span class="tag applied">Applied${m.appliedAt ? " " + new Date(m.appliedAt).toLocaleDateString() : ""}</span>` : ""}${j.gone ? `<span class="tag">no longer listed</span>` : ""}${c.cats.map((x) => `<span class="tag cat">${esc(x)}</span>`).join("")}</div>
+  </article>`;
+}
+function emptyHTML() {
+  if (!jobs.length && !cache.at) return `<div class="empty">No data yet — press <b>Fetch now</b> to scan ${S.companies.filter((c) => c.enabled).length} career sites.</div>`;
+  if (ui.view === "saved") return `<div class="empty">Nothing saved yet. Use ☆ on a posting.</div>`;
+  if (ui.view === "applied") return `<div class="empty">Mark postings with ✓ once you apply — they'll be tracked here.</div>`;
+  if (ui.view === "new") return `<div class="empty">No new postings since you last marked everything as seen.</div>`;
+  return `<div class="empty">No matching internships right now.${S.strict ? " Try turning off <b>Keyword-matched roles only</b>, or" : ""} broaden keywords in Settings. India intern hiring is seasonal — auto-refresh will flag new postings as they appear.</div>`;
+}
+function renderSources() {
+  const entries = Object.values(sourceStatus);
+  $("#sources").innerHTML = entries.length ? entries.map((s) => {
+    const cls = s.ok ? "ok" : s.skip ? "skip" : s.note ? "" : "err";
+    const txt = s.ok ? `${s.n} postings` : s.note ? s.note : s.err + (s.n ? ` (showing ${s.n} cached)` : "");
+    return `<div class="src"><span>${esc(s.label)}</span><span class="st ${cls}" title="${esc(txt)}">${esc(txt.length > 34 ? txt.slice(0, 32) + "…" : txt)}</span></div>`;
+  }).join("") : `<div class="src"><span class="st">Not fetched yet</span></div>`;
+}
+function renderProxyPill() {
+  const p = $("#proxyPill");
+  p.innerHTML = `<span class="dot ${proxyOK ? "ok" : "off"}"></span><span>${proxyOK ? "Proxy on · all sources" : "No proxy · limited sources"}</span>`;
+  p.title = proxyOK ? "Workday, AMD and Adzuna are reachable through /api/proxy" : "Run `node server.mjs` locally or deploy to Netlify with functions to unlock Workday/AMD/Adzuna sources";
+  const needs = S.companies.filter((c) => c.enabled && (c.type === "workday" || c.type === "amd")).length;
+  $("#banner").innerHTML = !proxyOK && needs ? `<div class="banner"><b>Limited mode:</b> ${needs} company sites (NVIDIA, Intel, ADI, Marvell, AMD…) need the proxy. Open this page through <code>node server.mjs</code> (http://localhost:8080) or a Netlify deploy with functions. Greenhouse/Ashby/Lever boards and JSearch still work here.</div>` : "";
+}
+function renderAutoPill() {
+  $("#autoPill").textContent = S.autoMin > 0 ? `Auto-refresh: ${S.autoMin >= 60 ? S.autoMin / 60 + " h" : S.autoMin + " min"}` : "Auto-refresh off";
+}
+function scheduleAuto() {
+  clearInterval(autoTimer); renderAutoPill();
+  if (S.autoMin > 0) autoTimer = setInterval(() => fetchAll({ auto: true }), S.autoMin * 60000);
+}
+
+/* ============================== events ============================== */
+$("#refreshBtn").onclick = () => fetchAll();
+$("#q").oninput = (e) => { ui.q = e.target.value; render(); };
+$("#companyFilter").onchange = (e) => { ui.company = e.target.value; render(); };
+$("#sort").onchange = (e) => { ui.sort = e.target.value; render(); };
+$("#strict").onchange = (e) => { S.strict = e.target.checked; LS.set("settings", S); render(); };
+$("#viewTabs").onclick = (e) => { const b = e.target.closest("button"); if (b) { ui.view = b.dataset.v; render(); } };
+$("#catChips").onclick = (e) => { const b = e.target.closest("[data-cat]"); if (!b) return; const n = b.dataset.cat; ui.cats.has(n) ? ui.cats.delete(n) : ui.cats.add(n); render(); };
+document.addEventListener("click", (e) => {
+  if (e.target.id === "markSeen") { seenMark = Date.now(); LS.set("seenMark", seenMark); render(); return; }
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const id = b.closest(".job").dataset.id, act = b.dataset.act;
+  const j = jobs.find((x) => x.id === id) || marks[id]?.job;
+  const m = marks[id] || {};
+  m[act] = !m[act];
+  if (act === "applied" && m.applied) { m.appliedAt = Date.now(); m.saved = m.saved || false; }
+  if (j) m.job = { id: j.id, title: j.title, company: j.company, location: j.location, url: j.url, posted: j.posted, source: j.source, dept: j.dept };
+  if (!m.saved && !m.applied && !m.hidden) delete marks[id]; else marks[id] = m;
+  LS.set("marks", marks); render();
+});
+$("#themeBtn").onclick = () => {
+  const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const next = cur === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = next; LS.set("theme", next);
+};
+
+/* ---------- settings dialog ---------- */
+let draftCos = [];
+function openSettings() {
+  draftCos = S.companies.map((c) => ({ ...c }));
+  renderCoRows();
+  $("#kwCats").value = S.cats; $("#kwIntern").value = S.intern; $("#kwExclude").value = S.exclude; $("#kwLoc").value = S.loc;
+  $("#jsKey").value = S.jsKey; $("#jsQueries").value = S.jsQueries; $("#azId").value = S.azId; $("#azKey").value = S.azKey; $("#azWords").value = S.azWords;
+  $("#autoMin").value = String(S.autoMin); $("#autoAgg").checked = S.autoAgg; $("#notify").checked = S.notify; $("#proxyBase").value = S.proxyBase;
+  $("#dlg").showModal();
+}
+const TYPE_LABEL = { workday: "Workday", greenhouse: "Greenhouse", lever: "Lever", ashby: "Ashby", amd: "AMD (iCIMS)" };
+function renderCoRows() {
+  $("#coRows").innerHTML = draftCos.map((c, i) => `<tr>
+    <td><input type="checkbox" data-i="${i}" class="coOn" ${c.enabled ? "checked" : ""}></td>
+    <td>${esc(c.name)}</td><td class="hide-sm">${TYPE_LABEL[c.type] || c.type}</td><td class="id hide-sm">${esc(c.id)}</td>
+    <td><button class="icon-btn coDel" data-i="${i}" title="Remove">✕</button></td></tr>`).join("");
+}
+$("#coRows").onclick = (e) => {
+  const i = Number(e.target.dataset.i);
+  if (e.target.classList.contains("coOn")) draftCos[i].enabled = e.target.checked;
+  if (e.target.classList.contains("coDel")) { draftCos.splice(i, 1); renderCoRows(); }
+};
+$("#addBtn").onclick = () => {
+  const name = $("#addName").value.trim(), type = $("#addType").value; let id = $("#addId").value.trim();
+  if (!name || !id) return toast("Enter a name and a URL/slug");
+  if (type === "workday") {
+    try { const p = parseWorkday(id); if (!/myworkdayjobs\.com$/.test(p.host) || !p.site) throw 0; id = `https://${p.host}/${p.site}`; }
+    catch { return toast("Workday URL should look like https://company.wd5.myworkdayjobs.com/SiteName"); }
+  }
+  draftCos.push({ name, type, id, enabled: true }); renderCoRows();
+  $("#addName").value = $("#addId").value = "";
+};
+$("#resetCos").onclick = () => { draftCos = DEFAULT_COMPANIES.map((c) => ({ ...c })); renderCoRows(); };
+$("#resetKw").onclick = () => { $("#kwCats").value = DEFAULT_CATS; $("#kwIntern").value = DEFAULT_INTERN; $("#kwExclude").value = DEFAULT_EXCLUDE; $("#kwLoc").value = DEFAULT_LOC; };
+$("#setTabs").onclick = (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  document.querySelectorAll("#setTabs button").forEach((x) => x.classList.toggle("on", x === b));
+  document.querySelectorAll(".pane").forEach((p) => p.classList.toggle("on", p.dataset.p === b.dataset.p));
+};
+$("#cancelSet").onclick = () => $("#dlg").close();
+$("#saveSet").onclick = async () => {
+  Object.assign(S, {
+    companies: draftCos, cats: $("#kwCats").value, intern: $("#kwIntern").value, exclude: $("#kwExclude").value, loc: $("#kwLoc").value,
+    jsKey: $("#jsKey").value.trim(), jsQueries: $("#jsQueries").value, azId: $("#azId").value.trim(), azKey: $("#azKey").value.trim(), azWords: $("#azWords").value.trim(),
+    autoMin: Number($("#autoMin").value), autoAgg: $("#autoAgg").checked, notify: $("#notify").checked, proxyBase: $("#proxyBase").value.trim(),
+  });
+  if (S.notify && "Notification" in window && Notification.permission === "default") { try { await Notification.requestPermission(); } catch {} }
+  LS.set("settings", S); $("#dlg").close(); scheduleAuto(); fetchAll();
+};
+$("#settingsBtn").onclick = openSettings;
+$("#clearCache").onclick = () => { jobs = []; sourceStatus = {}; cache = { jobs: [], at: 0, sources: {} }; facetCache = {}; LS.set("cache", cache); LS.set("facets", {}); render(); toast("Cache cleared"); };
+$("#exportBtn").onclick = () => {
+  const blob = new Blob([JSON.stringify({ marks, settings: { ...S, jsKey: "", azKey: "" } }, null, 2)], { type: "application/json" });
+  const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: "internship-tracker.json" }); a.click();
+};
+$("#importBtn").onclick = () => $("#importFile").click();
+$("#importFile").onchange = async (e) => {
+  try { const d = JSON.parse(await e.target.files[0].text()); if (d.marks) { marks = { ...marks, ...d.marks }; LS.set("marks", marks); } toast("Imported"); render(); }
+  catch { toast("Couldn't read that file"); }
+};
+
+/* ============================== boot ============================== */
+(function boot() {
+  const th = LS.get("theme", null); if (th) document.documentElement.dataset.theme = th;
+  $("#strict").checked = S.strict;
+  $("#quicklinks").innerHTML = QUICK_LINKS.map(([t, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)} ↗</a>`).join("");
+  render(); scheduleAuto();
+  checkProxy().then(() => { if (!cache.at || Date.now() - cache.at > 20 * 60000) fetchAll({ auto: !!cache.at }); });
+  setInterval(() => { if (!fetching) $("#lastFetch") && cache.at && render(); }, 60000);
+})();
+</script>
+</body>
+</html>
